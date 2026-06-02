@@ -1,4 +1,4 @@
-# cuckoo python
+# cuckoo
 
 A CLI tool written in Python designed as a flexible netcat replacement for raw socket communication, file transfers, and remote shell execution. Built as part of my 30-Days-30-Tools challenge.
 
