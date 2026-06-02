@@ -60,51 +60,74 @@ type ScanReport struct {
 
 var rules = []HeaderRule{
 	{
-		Header:   "Strict-Transport-Security",
-		Severity: High,
-		Description: "Tells the browser to ONLY connect over HTTPS for the " +
-			"next N seconds, defeating SSL-stripping attacks",
+		Header:		"Strict-Transport-Security",
+		Severity: 	High,
+		Description: 	"Tells the browser to ONLY connect over HTTPS for the " +
+				"next N seconds, defeating SSL-stripping attacks",
 		Recommendation: "Add: Strict-Transport-Security: max-age=31536000; includeSubDomains",
 		MustMatch:      `max-age\s*=\s*[1-9]`,
 	},
 	{
-		Header:   "Content-Security-Policy",
-		Severity: High,
-		Description: "Controls which scripts, styles, frames, and connections " +
-			"the browser may load — the strongest XSS defense",
+		Header:		"Content-Security-Policy",
+		Severity:	High,
+		Description:	"Controls which scripts, styles, frames, and connections " +
+				"the browser may load — the strongest XSS defense",
 		Recommendation: "Add a Content-Security-Policy that disallows " +
-			"'unsafe-inline' and limits sources to trusted origins",
-		MustMatch: "",
+				"'unsafe-inline' and limits sources to trusted origins",
+		MustMatch: 	"",
 	},
 	{
-		Header:   "X-Content-Type-Options",
-		Severity: Medium,
-		Description: "Stops browsers from second-guessing the Content-Type " +
-			"and treating a .txt file as HTML — defeats MIME-sniffing",
+		Header:		"X-Content-Type-Options",
+		Severity: 	Medium,
+		Description: 	"Stops browsers from second-guessing the Content-Type " +
+				"and treating a .txt file as HTML — defeats MIME-sniffing",
 		Recommendation: "Add: X-Content-Type-Options: nosniff",
 		MustMatch:      `nosniff`,
 	},
 	{
-		Header:   "X-Frame-Options",
-		Severity: Medium,
-		Description: "Prevents another site from embedding this page in an " +
-			"iframe, defeating clickjacking attacks",
+		Header:		"X-Frame-Options",
+		Severity: 	Medium,
+		Description: 	"Prevents another site from embedding this page in an " +
+				"iframe, defeating clickjacking attacks",
 		Recommendation: "Add: X-Frame-Options: DENY (or use Content-Security-Policy: frame-ancestors 'none')",
 		MustMatch:      "",
 	},
+        {       Header:         "Cross-Origin-Opener-Policy",
+                Severity:       Medium,
+                Description:    "Prevents the page from being interacted with by other origins " +
+                                "via window.opener, mitigating cross-origin attacks like Spectre",
+                Recommendation: "Add: Cross-Origin-Opener-Policy: same-origin",
+                MustMatch:      `same-origin`,
+        },
 	{
-		Header:   "Referrer-Policy",
-		Severity: Low,
-		Description: "Limits how much of the current URL leaks to other sites " +
-			"when the user clicks an outbound link",
+		Header:		"Cross-Origin-Embedder-Policy",
+		Severity:	Medium,
+		Description:	"Controls which cross-origin resources can be loaded, " +
+				"working with COOP to enable cross-origin isolation",
+		Recommendation:	"Add: Cross-Origin-Embedder-Policy: require-corp",
+		MustMatch:	`require-corp`
+	},
+	{
+		Header:		"Cross-Origin-Resource-Policy",
+		Severity:	"Medium,
+		Description:	"Controls which other origins are allowed to embed this resource, " +
+				"preventing cross-origin information leaks"
+		Recommendation:	"Add: Cross-Origin-Resource-Policy: same-origin",
+		MustMatch:	`same-origin`,
+	},
+	{
+		Header:		"Referrer-Policy",
+		Severity: 	Low,
+		Description: 	"Limits how much of the current URL leaks to other sites " +
+				"when the user clicks an outbound link",
 		Recommendation: "Add: Referrer-Policy: strict-origin-when-cross-origin",
 		MustMatch:      "",
 	},
 	{
-		Header:   "Permissions-Policy",
-		Severity: Low,
-		Description: "Disables browser features the page does not use " +
-			"(camera, microphone, geolocation, payments, etc.)",
+		Header:		"Permissions-Policy",
+		Severity: 	Low,
+		Description: 	"Disables browser features the page does not use " +
+				"(camera, microphone, geolocation, payments, etc.)",
 		Recommendation: "Add: Permissions-Policy: camera=(), microphone=(), geolocation=()",
 		MustMatch:      "",
 	},
@@ -199,7 +222,7 @@ func scan(targetURL string, timeout time.Duration) (*ScanReport, error) {
 	client := &http.Client{
 		Timeout: timeout,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return nil // Follow redirects automatically
+			return nil
 		},
 	}
 
