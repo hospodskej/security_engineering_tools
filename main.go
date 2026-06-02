@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"os"
+	"sort"
 
 	"github.com/pterm/pterm"
 )
@@ -17,7 +18,6 @@ func main() {
 	decryptKey := decryptCmd.Int("key", 3, "Shift key (used for Caesar)")
 
 	crackCmd := flag.NewFlagSet("crack", flag.ExitOnError)
-	crackAlgo := crackCmd.String("algo", "caesar", "Cipher algorithm to use")
 
 	if len(os.Args) < 2 {
 		pterm.FgRed.Println("Expected 'encrypt', 'decrypt', or 'crack' subcommands")
@@ -35,6 +35,8 @@ func main() {
 
 		if *encryptAlgo == "caesar" {
 			pterm.FgCyan.Println(CaesarEncrypt(text, *encryptKey))
+		} else if *encryptAlgo == "atbash" {
+			pterm.FgCyan.Println(AtbashProcess(text))
 		} else {
 			pterm.FgYellow.Printf("Algorithm '%s' is not supported yet.\n", *encryptAlgo)
 		}
@@ -50,6 +52,8 @@ func main() {
 
 		if *decryptAlgo == "caesar" {
 			pterm.FgCyan.Println(CaesarDecrypt(text, *decryptKey))
+		} else if *decryptAlgo == "atbash" {
+			pterm.FgCyan.Println(AtbashProcess(text))
 		} else {
 			pterm.FgYellow.Printf("Algorithm '%s' is not supported yet. \n", *decryptAlgo)
 		}
@@ -58,15 +62,22 @@ func main() {
 		crackCmd.Parse(os.Args[2:])
 		if crackCmd.NArg() == 0 {
 			pterm.FgRed.Println("Please provide text to crack")
-			os.Exit(1)
 		}
 		text := crackCmd.Arg(0)
 
-		if *crackAlgo == "caesar" {
-			results := CaesarCrack(text)
-			pterm.FgGreen.Printf("Top Match (Shift %d): %s\n", results[0].Shift, results[0].Text)
+		var allResults []CrackResult
+		allResults = append(allResults, CaesarCrack(text)...)
+		allResults = append(allResults, AtbashCrack(text))
+
+		sort.Slice(allResults, func(i, j int) bool {
+			return allResults[i].Score < allResults[j].Score
+		})
+
+		best := allResults[0]
+		if best.Algorithm == "Caesar" {
+			pterm.FgGreen.Println("Top Match [%s] (Shift %d): %s\n", best.Algorithm, best.Shift, best.Text)
 		} else {
-			pterm.FgYellow.Printf("Algorithm '%s' is not supported yet.\n", *crackAlgo)
+			pterm.FgGreen.Println("Top Match [%s]: %s\n", best.Algorithm, best.Text)
 		}
 
 	default:

@@ -16,9 +16,10 @@ var englishFrequencies = map[rune]float64{
 }
 
 type CrackResult struct {
-	Shift	int
-	Text	string
-	Score	float64
+	Algorithm	string
+	Shift		int
+	Text		string
+	Score		float64
 }
 
 func CaesarEncrypt(text string, shift int) string {
@@ -82,6 +83,7 @@ func CaesarCrack(text string) []CrackResult {
 		decryptedText := CaesarDecrypt(text, shift)
 		score := calculateChiSquared(decryptedText)
 		results = append(results, CrackResult{
+			Algorithm: "Caesar",
 			Shift:	shift,
 			Text:	decryptedText,
 			Score: score,
