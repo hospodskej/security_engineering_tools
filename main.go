@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"math"
@@ -36,19 +37,19 @@ var severityPoints = map[Severity]float64{
 }
 
 type HeaderRule struct {
-	Header         string
-	Severity       Severity
-	Description    string
-	Recommendation string
-	MustMatch      string
-	regex          *regexp.Regexp
+	Header         string		`json:"header"`
+	Severity       Severity		`json:"severity"`
+	Description    string		`json:"description"`
+	Recommendation string		`json:"recommendation"`
+	MustMatch      string		`json:"must_match"`
+	regex          *regexp.Regexp	`json:"-"`
 }
 
 type HeaderFinding struct {
-	Rule        HeaderRule
-	Status      Status
-	ActualValue string
-	Note        string
+	Rule        HeaderRule		`json:"rule"`
+	Status      Status		`json:"status"`
+	ActualValue string		`json:"actual_value"`
+	Note        string		`json:"note"`
 }
 
 type ScanReport struct {
@@ -105,13 +106,13 @@ var rules = []HeaderRule{
 		Description:	"Controls which cross-origin resources can be loaded, " +
 				"working with COOP to enable cross-origin isolation",
 		Recommendation:	"Add: Cross-Origin-Embedder-Policy: require-corp",
-		MustMatch:	`require-corp`
+		MustMatch:	`require-corp`,
 	},
 	{
 		Header:		"Cross-Origin-Resource-Policy",
-		Severity:	"Medium,
+		Severity:	Medium,
 		Description:	"Controls which other origins are allowed to embed this resource, " +
-				"preventing cross-origin information leaks"
+				"preventing cross-origin information leaks",
 		Recommendation:	"Add: Cross-Origin-Resource-Policy: same-origin",
 		MustMatch:	`same-origin`,
 	},
@@ -336,6 +337,8 @@ func renderReport(report *ScanReport) {
 
 func main() {
 	timeoutFlag := flag.Float64("timeout", 10.0, "Seconds to wait before giving up on the request")
+	jsonFlag := flag.Bool("json", false, "Output machine-readable JSON instead of a table")
+
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: kiwi [flags] <url>\n\nFlags:\n")
 		flag.PrintDefaults()
@@ -356,18 +359,54 @@ func main() {
 
 	timeout := time.Duration(*timeoutFlag * float64(time.Second))
 
-	spinner, _ := pterm.DefaultSpinner.Start(fmt.Sprintf("Scanning %s...", targetURL))
+	var spinner *pterm.SpinnerPrinter
+	if !*jsonFlag {
+		spinner, _ = pterm.DefaultSpinner.Start(fmt.Sprintf("Scanning %s...", targetURL))
+	}
+
 	report, err := scan(targetURL, timeout)
 
-	spinner.Stop()
+	if spinner != nil {
+		spinner.Stop()
+	}
 
 	if err != nil {
-		pterm.FgRed.Printf("Request failed: %v", err)
+		if *jsonFlag {
+			fmt.Fprintf(os.Stderr, `{"error": "%v"}` + "\n", err)
+		} else {
+			pterm.FgRed.Printf("Request failed: %v\n", err)
+		}
 		os.Exit(2)
 	}
 
-	pterm.FgGreen.Println("Scan complete")
+	if *jsonFlag {
+		out := struct {
+			URL		string		`json:"url"`
+			FinalURL	string		`json:"final_url"`
+			StatusCode	int		`json:"status_code"`
+			Score		int		`json:"score"`
+			Grade		string		`json:"grade"`
+			Findings	[]HeaderFinding	`json:"findings"`
+		}{
+			URL:		report.URL,
+			FinalURL:	report.FinalURL,
+			StatusCode:	report.StatusCode,
+			Score:		report.Score(),
+			Grade:		report.Grade(),
+			Findings:	report.Findings,
+		}
 
+		encoder := json.NewEncoder(os.Stdout)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(out); err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to encode JSON: %v\n", err)
+			os.Exit(2)
+		}
+
+		os.Exit(0)
+	}
+
+	pterm.FgGreen.Println("Scan complete")
 	renderReport(report)
 
 	grade := report.Grade()

@@ -1,0 +1,117 @@
+{
+  "url": "https://example.com",
+  "final_url": "https://example.com",
+  "status_code": 200,
+  "score": 0,
+  "grade": "F",
+  "findings": [
+    {
+      "Rule": {
+        "Header": "Strict-Transport-Security",
+        "Severity": "high",
+        "Description": "Tells the browser to ONLY connect over HTTPS for the next N seconds, defeating SSL-stripping attacks",
+        "Recommendation": "Add: Strict-Transport-Security: max-age=31536000; includeSubDomains",
+        "MustMatch": "max-age\\s*=\\s*[1-9]"
+      },
+      "Status": "missing",
+      "ActualValue": "",
+      "Note": "Header `Strict-Transport-Security` is not set"
+    },
+    {
+      "Rule": {
+        "Header": "Content-Security-Policy",
+        "Severity": "high",
+        "Description": "Controls which scripts, styles, frames, and connections the browser may load — the strongest XSS defense",
+        "Recommendation": "Add a Content-Security-Policy that disallows 'unsafe-inline' and limits sources to trusted origins",
+        "MustMatch": ""
+      },
+      "Status": "missing",
+      "ActualValue": "",
+      "Note": "Header `Content-Security-Policy` is not set"
+    },
+    {
+      "Rule": {
+        "Header": "X-Content-Type-Options",
+        "Severity": "medium",
+        "Description": "Stops browsers from second-guessing the Content-Type and treating a .txt file as HTML — defeats MIME-sniffing",
+        "Recommendation": "Add: X-Content-Type-Options: nosniff",
+        "MustMatch": "nosniff"
+      },
+      "Status": "missing",
+      "ActualValue": "",
+      "Note": "Header `X-Content-Type-Options` is not set"
+    },
+    {
+      "Rule": {
+        "Header": "X-Frame-Options",
+        "Severity": "medium",
+        "Description": "Prevents another site from embedding this page in an iframe, defeating clickjacking attacks",
+        "Recommendation": "Add: X-Frame-Options: DENY (or use Content-Security-Policy: frame-ancestors 'none')",
+        "MustMatch": ""
+      },
+      "Status": "missing",
+      "ActualValue": "",
+      "Note": "Header `X-Frame-Options` is not set"
+    },
+    {
+      "Rule": {
+        "Header": "Cross-Origin-Opener-Policy",
+        "Severity": "medium",
+        "Description": "Prevents the page from being interacted with by other origins via window.opener, mitigating cross-origin attacks like Spectre",
+        "Recommendation": "Add: Cross-Origin-Opener-Policy: same-origin",
+        "MustMatch": "same-origin"
+      },
+      "Status": "missing",
+      "ActualValue": "",
+      "Note": "Header `Cross-Origin-Opener-Policy` is not set"
+    },
+    {
+      "Rule": {
+        "Header": "Cross-Origin-Embedder-Policy",
+        "Severity": "medium",
+        "Description": "Controls which cross-origin resources can be loaded, working with COOP to enable cross-origin isolation",
+        "Recommendation": "Add: Cross-Origin-Embedder-Policy: require-corp",
+        "MustMatch": "require-corp"
+      },
+      "Status": "missing",
+      "ActualValue": "",
+      "Note": "Header `Cross-Origin-Embedder-Policy` is not set"
+    },
+    {
+      "Rule": {
+        "Header": "Cross-Origin-Resource-Policy",
+        "Severity": "medium",
+        "Description": "Controls which other origins are allowed to embed this resource, preventing cross-origin information leaks",
+        "Recommendation": "Add: Cross-Origin-Resource-Policy: same-origin",
+        "MustMatch": "same-origin"
+      },
+      "Status": "missing",
+      "ActualValue": "",
+      "Note": "Header `Cross-Origin-Resource-Policy` is not set"
+    },
+    {
+      "Rule": {
+        "Header": "Referrer-Policy",
+        "Severity": "low",
+        "Description": "Limits how much of the current URL leaks to other sites when the user clicks an outbound link",
+        "Recommendation": "Add: Referrer-Policy: strict-origin-when-cross-origin",
+        "MustMatch": ""
+      },
+      "Status": "missing",
+      "ActualValue": "",
+      "Note": "Header `Referrer-Policy` is not set"
+    },
+    {
+      "Rule": {
+        "Header": "Permissions-Policy",
+        "Severity": "low",
+        "Description": "Disables browser features the page does not use (camera, microphone, geolocation, payments, etc.)",
+        "Recommendation": "Add: Permissions-Policy: camera=(), microphone=(), geolocation=()",
+        "MustMatch": ""
+      },
+      "Status": "missing",
+      "ActualValue": "",
+      "Note": "Header `Permissions-Policy` is not set"
+    }
+  ]
+}
