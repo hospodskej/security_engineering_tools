@@ -1,6 +1,6 @@
 # crow
 
-An universal CLI tool used to Encrypt, Decrypt and Crack cyphers. Created as part of my 30-Days-30-Tools challenge.
+An universal CLI tool used to Encrypt, Decrypt and Crack cyphers.
 
 ## Features
 * **Automated Cracking:** Automatically tests all possible cryptographic shifts in milliseconds without needing the user to guess the key.
