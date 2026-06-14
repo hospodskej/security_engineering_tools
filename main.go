@@ -37,19 +37,18 @@ var severityPoints = map[Severity]float64{
 }
 
 type HeaderRule struct {
-	Header         string		`json:"header"`
-	Severity       Severity		`json:"severity"`
-	Description    string		`json:"description"`
-	Recommendation string		`json:"recommendation"`
-	MustMatch      string		`json:"must_match"`
-	regex          *regexp.Regexp	`json:"-"`
+	Header         string         `json:"header"`
+	Severity       Severity       `json:"severity"`
+	Description    string         `json:"description"`
+	Recommendation string         `json:"recommendation"`
+	MustMatch      string         `json:"must_match"`
+	regex          *regexp.Regexp `json:"-"`
 }
 
 type HeaderFinding struct {
-	Rule        HeaderRule		`json:"rule"`
-	Status      Status		`json:"status"`
-	ActualValue string		`json:"actual_value"`
-	Note        string		`json:"note"`
+	Rule        HeaderRule `json:"rule"`
+	Status      Status     `json:"status"`
+	ActualValue string     `json:"actual_value"`
 }
 
 type ScanReport struct {
@@ -61,74 +60,65 @@ type ScanReport struct {
 
 var rules = []HeaderRule{
 	{
-		Header:		"Strict-Transport-Security",
-		Severity: 	High,
-		Description: 	"Tells the browser to ONLY connect over HTTPS for the " +
-				"next N seconds, defeating SSL-stripping attacks",
+		Header:         "Strict-Transport-Security",
+		Severity:       High,
+		Description:    "Tells the browser to ONLY connect over HTTPS for the next N seconds, defeating SSL-stripping attacks",
 		Recommendation: "Add: Strict-Transport-Security: max-age=31536000; includeSubDomains",
 		MustMatch:      `max-age\s*=\s*[1-9]`,
 	},
 	{
-		Header:		"Content-Security-Policy",
-		Severity:	High,
-		Description:	"Controls which scripts, styles, frames, and connections " +
-				"the browser may load — the strongest XSS defense",
-		Recommendation: "Add a Content-Security-Policy that disallows " +
-				"'unsafe-inline' and limits sources to trusted origins",
-		MustMatch: 	"",
+		Header:         "Content-Security-Policy",
+		Severity:       High,
+		Description:    "Controls which scripts, styles, frames, and connections the browser may load — the strongest XSS defense",
+		Recommendation: "Add a Content-Security-Policy that disallows 'unsafe-inline' and limits sources to trusted origins",
+		MustMatch:      "",
 	},
 	{
-		Header:		"X-Content-Type-Options",
-		Severity: 	Medium,
-		Description: 	"Stops browsers from second-guessing the Content-Type " +
-				"and treating a .txt file as HTML — defeats MIME-sniffing",
+		Header:         "X-Content-Type-Options",
+		Severity:       Medium,
+		Description:    "Stops browsers from second-guessing the Content-Type and treating a .txt file as HTML — defeats MIME-sniffing",
 		Recommendation: "Add: X-Content-Type-Options: nosniff",
 		MustMatch:      `nosniff`,
 	},
 	{
-		Header:		"X-Frame-Options",
-		Severity: 	Medium,
-		Description: 	"Prevents another site from embedding this page in an " +
-				"iframe, defeating clickjacking attacks",
+		Header:         "X-Frame-Options",
+		Severity:       Medium,
+		Description:    "Prevents another site from embedding this page in an iframe, defeating clickjacking attacks",
 		Recommendation: "Add: X-Frame-Options: DENY (or use Content-Security-Policy: frame-ancestors 'none')",
 		MustMatch:      "",
 	},
-        {       Header:         "Cross-Origin-Opener-Policy",
-                Severity:       Medium,
-                Description:    "Prevents the page from being interacted with by other origins " +
-                                "via window.opener, mitigating cross-origin attacks like Spectre",
-                Recommendation: "Add: Cross-Origin-Opener-Policy: same-origin",
-                MustMatch:      `same-origin`,
-        },
 	{
-		Header:		"Cross-Origin-Embedder-Policy",
-		Severity:	Medium,
-		Description:	"Controls which cross-origin resources can be loaded, " +
-				"working with COOP to enable cross-origin isolation",
-		Recommendation:	"Add: Cross-Origin-Embedder-Policy: require-corp",
-		MustMatch:	`require-corp`,
+		Header:         "Cross-Origin-Opener-Policy",
+		Severity:       Medium,
+		Description:    "Prevents the page from being interacted with by other origins via window.opener, mitigating cross-origin attacks like Spectre",
+		Recommendation: "Add: Cross-Origin-Opener-Policy: same-origin",
+		MustMatch:      `same-origin`,
 	},
 	{
-		Header:		"Cross-Origin-Resource-Policy",
-		Severity:	Medium,
-		Description:	"Controls which other origins are allowed to embed this resource, " +
-				"preventing cross-origin information leaks",
-		Recommendation:	"Add: Cross-Origin-Resource-Policy: same-origin",
-		MustMatch:	`same-origin`,
+		Header:         "Cross-Origin-Embedder-Policy",
+		Severity:       Medium,
+		Description:    "Controls which cross-origin resources can be loaded, working with COOP to enable cross-origin isolation",
+		Recommendation: "Add: Cross-Origin-Embedder-Policy: require-corp",
+		MustMatch:      `require-corp`,
 	},
 	{
-		Header:		"Referrer-Policy",
-		Severity: 	Low,
-		Description: 	"Limits how much of the current URL leaks to other sites " +
-				"when the user clicks an outbound link",
+		Header:         "Cross-Origin-Resource-Policy",
+		Severity:       Medium,
+		Description:    "Controls which other origins are allowed to embed this resource, preventing cross-origin information leaks",
+		Recommendation: "Add: Cross-Origin-Resource-Policy: same-origin",
+		MustMatch:      `same-origin`,
+	},
+	{
+		Header:         "Referrer-Policy",
+		Severity:       Low,
+		Description:    "Limits how much of the current URL leaks to other sites when the user clicks an outbound link",
 		Recommendation: "Add: Referrer-Policy: strict-origin-when-cross-origin",
 		MustMatch:      "",
 	},
 	{
-		Header:		"Permissions-Policy",
-		Severity: 	Low,
-		Description: 	"Disables browser features the page does not use " +
-				"(camera, microphone, geolocation, payments, etc.)",
+		Header:         "Permissions-Policy",
+		Severity:       Low,
+		Description:    "Disables browser features the page does not use (camera, microphone, geolocation, payments, etc.)",
 		Recommendation: "Add: Permissions-Policy: camera=(), microphone=(), geolocation=()",
 		MustMatch:      "",
 	},
@@ -189,7 +179,6 @@ func evaluateHeader(rule HeaderRule, headers http.Header) HeaderFinding {
 			Rule:        rule,
 			Status:      Missing,
 			ActualValue: "",
-			Note:        fmt.Sprintf("Header `%s` is not set", rule.Header),
 		}
 	}
 
@@ -198,7 +187,6 @@ func evaluateHeader(rule HeaderRule, headers http.Header) HeaderFinding {
 			Rule:        rule,
 			Status:      Ok,
 			ActualValue: actualValue,
-			Note:        "Present",
 		}
 	}
 
@@ -207,7 +195,6 @@ func evaluateHeader(rule HeaderRule, headers http.Header) HeaderFinding {
 			Rule:        rule,
 			Status:      Ok,
 			ActualValue: actualValue,
-			Note:        fmt.Sprintf("Present and matches `%s`", rule.MustMatch),
 		}
 	}
 
@@ -215,7 +202,6 @@ func evaluateHeader(rule HeaderRule, headers http.Header) HeaderFinding {
 		Rule:        rule,
 		Status:      Weak,
 		ActualValue: actualValue,
-		Note:        fmt.Sprintf("Present but does not match `%s` (got `%s`)", rule.MustMatch, actualValue),
 	}
 }
 
@@ -283,20 +269,14 @@ func renderReport(report *ScanReport) {
 	pterm.FgCyan.Printf("Headers for %s (HTTP %d)\n\n", report.FinalURL, report.StatusCode)
 
 	tableData := pterm.TableData{
-		{"HEADER", "STATUS", "SEVERITY", "NOTE"},
+		{"HEADER", "STATUS", "SEVERITY"},
 	}
 
 	for _, f := range report.Findings {
-		note := f.Note
-		if len(note) > 40 {
-			note = note[:37] + "..."
-		}
-
 		tableData = append(tableData, []string{
 			pterm.White(f.Rule.Header),
 			getStatusStyle(f.Status).Sprint(strings.ToUpper(string(f.Status))),
 			string(f.Rule.Severity),
-			pterm.Gray(note),
 		})
 	}
 
@@ -372,7 +352,7 @@ func main() {
 
 	if err != nil {
 		if *jsonFlag {
-			fmt.Fprintf(os.Stderr, `{"error": "%v"}` + "\n", err)
+			fmt.Fprintf(os.Stderr, `{"error": "%v"}`+"\n", err)
 		} else {
 			pterm.FgRed.Printf("Request failed: %v\n", err)
 		}
@@ -381,19 +361,19 @@ func main() {
 
 	if *jsonFlag {
 		out := struct {
-			URL		string		`json:"url"`
-			FinalURL	string		`json:"final_url"`
-			StatusCode	int		`json:"status_code"`
-			Score		int		`json:"score"`
-			Grade		string		`json:"grade"`
-			Findings	[]HeaderFinding	`json:"findings"`
+			URL        string          `json:"url"`
+			FinalURL   string          `json:"final_url"`
+			StatusCode int             `json:"status_code"`
+			Score      int             `json:"score"`
+			Grade      string          `json:"grade"`
+			Findings   []HeaderFinding `json:"findings"`
 		}{
-			URL:		report.URL,
-			FinalURL:	report.FinalURL,
-			StatusCode:	report.StatusCode,
-			Score:		report.Score(),
-			Grade:		report.Grade(),
-			Findings:	report.Findings,
+			URL:        report.URL,
+			FinalURL:   report.FinalURL,
+			StatusCode: report.StatusCode,
+			Score:      report.Score(),
+			Grade:      report.Grade(),
+			Findings:   report.Findings,
 		}
 
 		encoder := json.NewEncoder(os.Stdout)
