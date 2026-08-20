@@ -1,6 +1,6 @@
 # cuckoo
 
-A CLI tool written in Python designed as a flexible netcat replacement for raw socket communication, file transfers, and remote shell execution.
+A CLI tool written in Python designed as a flexible netcat replacement for raw socket communication, file transfers, and remote shell execution. Archived.
 
 ## Features
 
