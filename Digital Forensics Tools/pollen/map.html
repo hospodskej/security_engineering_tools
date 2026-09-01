@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Photo Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    .popup-img { max-width: 200px; max-height: 150px; display: block; margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    var map = L.map('map').setView([43.46744833333334, 11.88512666666389], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var photoData = [{"file":"testpictures/DSCN0010.jpg","latitude":43.46744833333334,"longitude":11.88512666666389,"datetime":"2008-10-22 16:28:39 +0200","make":"NIKON","model":"COOLPIX P6000","exposure_time":"1/75","f_number":"59/10","iso":64,"focal_length":"24/1"},{"file":"testpictures/DSCN0012.jpg","latitude":43.46715666666389,"longitude":11.885394999997223,"datetime":"2008-10-22 16:29:49 +0200","make":"NIKON","model":"COOLPIX P6000","exposure_time":"140213/25000000","f_number":"9/2","iso":64,"focal_length":"6/1"},{"file":"testpictures/DSCN0021.jpg","latitude":43.46708166666389,"longitude":11.884538333330555,"datetime":"2008-10-22 16:38:20 +0200","make":"NIKON","model":"COOLPIX P6000","exposure_time":"261233/25000000","f_number":"47/10","iso":64,"focal_length":"83/5"},{"file":"testpictures/DSCN0025.jpg","latitude":43.468365,"longitude":11.881634999972222,"datetime":"2008-10-22 16:43:21 +0200","make":"NIKON","model":"COOLPIX P6000","exposure_time":"813669/100000000","f_number":"37/10","iso":64,"focal_length":"81/10"},{"file":"testpictures/DSCN0027.jpg","latitude":43.46844166666667,"longitude":11.881515,"datetime":"2008-10-22 16:44:01 +0200","make":"NIKON","model":"COOLPIX P6000","exposure_time":"169033/25000000","f_number":"41/10","iso":64,"focal_length":"6/1"},{"file":"testpictures/DSCN0029.jpg","latitude":43.468243333330555,"longitude":11.880171666638889,"datetime":"2008-10-22 16:46:53 +0200","make":"NIKON","model":"COOLPIX P6000","exposure_time":"1543209/100000000","f_number":"28/5","iso":64,"focal_length":"221/10"},{"file":"testpictures/DSCN0038.jpg","latitude":43.46725499999722,"longitude":11.879213333333333,"datetime":"2008-10-22 16:52:15 +0200","make":"NIKON","model":"COOLPIX P6000","exposure_time":"1555209/100000000","f_number":"59/10","iso":103,"focal_length":"24/1"},{"file":"testpictures/DSCN0040.jpg","latitude":43.466011666638884,"longitude":11.87911166663889,"datetime":"2008-10-22 16:55:37 +0200","make":"NIKON","model":"COOLPIX P6000","exposure_time":"152207/20000000","f_number":"41/10","iso":64,"focal_length":"6/1"},{"file":"testpictures/DSCN0042.jpg","latitude":43.464455,"longitude":11.881478333333334,"datetime":"2008-10-22 17:00:07 +0200","make":"NIKON","model":"COOLPIX P6000","exposure_time":"1/100","f_number":"22/5","iso":64,"focal_length":"15/1"}];
+
+    photoData.forEach(function(photo) {
+      var popupContent = '';
+      if (photo.file) {
+        popupContent += '<img class="popup-img" src="file://' + photo.file.replace(/\\/g, '/') + '" alt="Photo">';
+      }
+      popupContent += '<b>' + (photo.datetime || 'Unknown date') + '</b><br>';
+      if (photo.make) popupContent += 'Camera: ' + photo.make + ' ' + (photo.model || '') + '<br>';
+      if (photo.exposure_time) popupContent += 'Exposure: ' + photo.exposure_time + 's<br>';
+      if (photo.f_number) popupContent += 'Aperture: f/' + photo.f_number + '<br>';
+      if (photo.iso) popupContent += 'ISO: ' + photo.iso + '<br>';
+      if (photo.focal_length) popupContent += 'Focal length: ' + photo.focal_length + 'mm<br>';
+
+      L.marker([photo.latitude, photo.longitude])
+        .addTo(map)
+        .bindPopup(popupContent);
+    });
+  </script>
+</body>
+</html>
