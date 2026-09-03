@@ -10,7 +10,7 @@ Current collection includes:
 # Networking Tools:  
 - cuckoo, a netcat clone written in Python  
 - kiwi, a HTTP header scanner written in Go  
-- mantis, a TCP port scanner  
+- mantis, a TCP port scanner  written in Go
 
 # Digital Forensics Tools:
 - pollen, an EXIF Data Bulk Extractor & Geolocation Mapper written in Ruby  
