@@ -4,6 +4,9 @@ My collection of tools for all the parts of Cybersecurity, mostly focused on Dig
 ----
 Current collection includes:  
 
+# Open Source Intelligence Tools
+- hawk, a geographical recon and facility profiler written in Ruby
+
 # Networking Tools:  
 - cuckoo, a netcat clone written in Python  
 - kiwi, a HTTP header scanner written in Go  
