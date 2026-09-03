@@ -10,7 +10,7 @@ Current collection includes:
 - mantis, a TCP port scanner  
 
 # Digital Forensics Tools:
-- Palyn, an EXIF Data Bulk Extractor & Geolocation Mapper written in Ruby  
+- pollen, an EXIF Data Bulk Extractor & Geolocation Mapper written in Ruby  
 
 # Cryptography Tools:
 - corvid, a hasher identifier written in Go  
