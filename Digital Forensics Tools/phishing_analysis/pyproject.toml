@@ -1,0 +1,13 @@
+[project]
+name = "phishing-analysis"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "dnspython>=2.8.0",
+    "pyyaml>=6.0.3",
+    "requests>=2.34.2",
+    "tldextract>=5.3.1",
+]

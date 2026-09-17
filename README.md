@@ -14,6 +14,7 @@ Current collection includes:
 
 # Digital Forensics Tools:
 - pollen, an EXIF Data Bulk Extractor & Geolocation Mapper written in Ruby  
+- phishing_analysis, a phishing email investigation toolkit (header/SPF/DKIM/DMARC analysis & reporting) written in Python
 
 # Cryptography Tools:
 - corvid, a hasher identifier written in Go  

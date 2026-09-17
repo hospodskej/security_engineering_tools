@@ -1,0 +1,6 @@
+virustotal_api_key: ""
+urlscan_api_key: ""
+abuseipdb_api_key: ""
+safe_browsing_api_key: ""
+geoip_selfcheck: true
+max_url_checks: 5
