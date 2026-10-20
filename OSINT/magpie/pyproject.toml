@@ -1,0 +1,20 @@
+[project]
+name = "magpie"
+version = "0.1.0"
+description = "Watches Czech rental sites and sends a push notification when a matching flat is listed"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "beautifulsoup4>=4.12",
+    "pyyaml>=6.0",
+    "requests>=2.32",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

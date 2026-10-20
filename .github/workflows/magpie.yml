@@ -1,0 +1,70 @@
+name: magpie
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      test_notify:
+        description: Only send a test notification
+        type: boolean
+        default: false
+  push:
+    branches-ignore: [main]
+    paths: ["OSINT/magpie/**", ".github/workflows/magpie.yml"]
+
+# Never run two checks at once: they would race on the seen-listings state.
+concurrency:
+  group: magpie-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: OSINT/magpie
+    env:
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: OSINT/magpie/uv.lock
+      - run: uv sync --frozen
+
+      # Feature branches: run the tests and a dry run against the live sites.
+      - name: Tests
+        if: github.event_name == 'push'
+        run: uv run pytest -q
+      - name: Dry run
+        if: github.event_name == 'push'
+        run: uv run python main.py --dry-run -v
+
+      - name: Test notification
+        if: github.event_name == 'workflow_dispatch' && inputs.test_notify
+        run: uv run python main.py --test-notify
+
+      # Scheduled runs: the seen-listings state lives in the Actions cache. Each run
+      # restores the newest copy and saves its own under a new key.
+      - name: Restore state
+        if: github.event_name != 'push' && !inputs.test_notify
+        uses: actions/cache/restore@v4
+        with:
+          path: OSINT/magpie/state
+          key: magpie-state-${{ github.run_id }}
+          restore-keys: magpie-state-
+      - name: Check listings
+        if: github.event_name != 'push' && !inputs.test_notify
+        run: uv run python main.py
+      - name: Save state
+        if: always() && github.event_name != 'push' && !inputs.test_notify
+        uses: actions/cache/save@v4
+        with:
+          path: OSINT/magpie/state
+          key: magpie-state-${{ github.run_id }}

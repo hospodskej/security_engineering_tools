@@ -1,0 +1,124 @@
+# magpie configuration: what to watch and what counts as a match.
+# Secrets (the ntfy topic) come from environment variables, never from this file.
+
+sources:
+  idnes:
+    url: https://reality.idnes.cz/s/pronajem/byty/do-14000-za-mesic/brno-mesto/
+    pages: 3
+  realitymix:
+    url: https://realitymix.cz/reality/byty/pronajem/jihomoravsky/brno-mesto
+    pages: 2
+  bazos:
+    url: https://www.bazos.cz/rss.php?rub=re&cat=65&typ=3
+
+price:
+  # Rent + monthly fees (services, energy). When a listing doesn't state its fees,
+  # the rent alone is compared and the alert is marked "fees not listed".
+  max_total: 14000
+
+area:
+  # The city and its declined forms ("v Brně", "z Brna").
+  city_forms: [Brno, Brna, Brně, Brnem, Brnu]
+  # Central to western Brno, around Brněnská přehrada: the Brno-střed district plus the
+  # western neighbourhoods. Matched as whole words against the listing's address and
+  # title, ignoring case and diacritics.
+  include:
+    - Bystrc
+    - Kníničky
+    - Rozdrojovice
+    - Jinačovice
+    - Moravské Knínice
+    - Žebětín
+    - Komín
+    - Medlánky
+    - Jundrov
+    - Žabovřesky
+    - Kohoutovice
+    - Bosonohy
+    - Nový Lískovec
+    - Kamenný Vrch
+    - Starý Lískovec
+    - Pisárky
+    - Veveří
+    - Stránice
+    - Staré Brno
+    - Štýřice
+    - Trnitá      # parts of these two are in the Brno-střed district,
+    - Zábrdovice  # which other sites report instead
+    - Město Brno
+    - Brno - Brno-město   # how iDNES writes the historic centre
+    - Brno-střed
+    - centrum Brna
+    - Brno centrum
+  # Other parts of Brno: a listing that names one of these is skipped.
+  exclude:
+    - Královo Pole
+    - Ponava
+    - Sadová
+    - Řečkovice
+    - Mokrá Hora
+    - Ivanovice
+    - Jehnice
+    - Ořešín
+    - Útěchov
+    - Soběšice
+    - Lesná
+    - Brno-sever
+    - Černá Pole
+    - Husovice
+    - Židenice
+    - Juliánov
+    - Líšeň
+    - Vinohrady
+    - Maloměřice
+    - Obřany
+    - Slatina
+    - Tuřany
+    - Brněnské Ivanovice
+    - Chrlice
+    - Holásky
+    - Dvorska
+    - Černovice
+    - Komárov
+    - Horní Heršpice
+    - Dolní Heršpice
+    - Přízřenice
+    - Bohunice
+    - Brno-jih
+  # Used when a listing has GPS but no recognisable place name: [lat, lon] corners
+  # of the area above (přehrada and Kníničky in the north-west, the centre in the east).
+  polygon:
+    - [49.300, 16.500]
+    - [49.280, 16.570]
+    - [49.235, 16.585]
+    - [49.212, 16.600]
+    - [49.200, 16.618]
+    - [49.188, 16.615]
+    - [49.180, 16.605]
+    - [49.170, 16.585]
+    - [49.160, 16.560]
+    - [49.170, 16.520]
+    - [49.190, 16.450]
+    - [49.230, 16.420]
+    - [49.280, 16.440]
+  # Bazoš only gives a postcode. Advertisers often pick a nearby one, so postcodes
+  # decide only when nothing else does.
+  include_postcodes: ["616 00", "623 00", "624 00", "634 00", "635 00", "641 00", "642 00"]
+  exclude_postcodes: ["612 00", "613 00", "614 00", "615 00", "617 00", "618 00", "620 00",
+                      "627 00", "628 00", "638 00", "644 00"]
+  # Brno listings whose area can't be determined: alert (marked "area unclear") or skip.
+  notify_unknown_area: true
+
+rooms:
+  # Besides rooms in shared flats (always skipped), skip titles containing these words.
+  exclude_title_words: [hledám, hledáme, sháním, výměna, výměnu, ubytování, krátkodobý, krátkodobě]
+
+health:
+  # Send one warning if a site fails this many runs in a row (6 runs = 1 hour).
+  alert_after_failures: 6
+
+# The first run sees everything currently listed; at most this many are sent (quietly).
+first_run_limit: 15
+
+notify:
+  server: https://ntfy.sh

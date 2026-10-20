@@ -6,6 +6,7 @@ Current collection includes:
 
 # Open Source Intelligence Tools
 - hawk, a geographical recon and facility profiler written in Ruby
+- magpie, a rental listing scraper that pushes phone alerts for new flats matching an area and budget, written in Python
 
 # Networking Tools:  
 - cuckoo, a netcat clone written in Python  
